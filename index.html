@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maplewood Recycling Schedule 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <nav class="main-nav">
+                <a href="schedule.html">Schedule</a>
+                <a href="guidelines.html">Guidelines</a>
+                <a href="index.html" class="active">Reminders</a>
+            </nav>
+            <h1>Calendar Reminders</h1>
+            <p class="subtitle">Get the 2026 schedule for your zone imported directly to your Google Calendar.</p>
+        </header>
+
+        <div class="content">
+
+            <!-- MAIN FORM VIEW -->
+            <div id="scheduler-form">
+                <div class="form-group">
+                    <label for="zone-select">Where do you live? <span class="schedule-sub">Find your zone <a
+                                href="https://www.maplewoodnj.gov/Home/Components/News/News/1250/15">here</a>.</span></label>
+                    <select id="zone-select" onchange="updateReminderLabels()">
+                        <option value="Monday">Zone 1 & 2 (Monday Pickup)</option>
+                        <option value="Tuesday">Zone 3 & 4 (Tuesday Pickup)</option>
+                        <option value="Wednesday">Zone 5 & 6 (Wednesday Pickup)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Reminder schedule <span class="schedule-sub">Do you want your calendar events to be on pickup
+                            day or the night before?</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="remind-night" name="reminder-timing" value="night" checked
+                                onchange="updateTimeDefault()">
+                            <label for="remind-night">
+                                <span class="option-title">Night Before</span>
+                                <span id="night-day-text" class="option-day">Sunday Night</span>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="remind-morning" name="reminder-timing" value="morning"
+                                onchange="updateTimeDefault()">
+                            <label for="remind-morning">
+                                <span class="option-title">Morning Of</span>
+                                <span id="morning-day-text" class="option-day">Monday Morning</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reminder-time">Reminder Time</label>
+                    <input type="time" id="reminder-time" value="20:00">
+                </div>
+
+                <button class="btn-primary" onclick="downloadSchedule()">Download 2026 Schedule</button>
+                <button class="btn-secondary" onclick="previewSchedule()">Preview Schedule</button>
+            </div>
+
+            <!-- NEXT STEPS VIEW (Hidden by default) -->
+            <div id="next-steps" style="display: none;">
+                <div class="success-banner">
+                    <span>✅</span> Download Started!
+                </div>
+
+                <h2 class="steps-title">Next Steps: Import</h2>
+                <p style="margin-bottom: 20px; color: #555;">Follow these steps to add the file to Google Calendar:</p>
+
+                <ol class="steps-list">
+                    <li>Open <strong>Google Calendar</strong> on a desktop computer.</li>
+                    <li>Click the <strong>Gear Icon</strong> ⚙️ at the top right, then select <strong>Settings</strong>.
+                    </li>
+                    <li>In the left sidebar, click <strong>Import & export</strong>.</li>
+                    <li>Click "Select file from your computer" and choose the <strong>.csv file</strong> you just
+                        downloaded.</li>
+                    <li><strong>Important:</strong> Select the calendar you want to add these events to (e.g., your main
+                        calendar).</li>
+                    <li>Click <strong>Import</strong>.</li>
+                </ol>
+
+                <button class="btn-secondary" onclick="resetForm()">Start Over / Choose Different Zone</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            Based on the official 2026 Maplewood <a
+                href="https://www.maplewoodnj.gov/Home/Components/News/News/1250/15">DPW Schedule</a>. <br />
+
+            Made by <a href="https://ft.io">Frank</a>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="preview-modal" onclick="closeModalOnOutsideClick(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Zone Schedule</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="table-container">
+                <table id="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Pickup Date</th>
+                            <th>Type</th>
+                            <th>Reminder</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body">
+                        <!-- Rows generated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // --- CONFIGURATION ---
+        // YEAR and helpers are in script.js
+
+        function updateTimeDefault() {
+            const isNight = document.getElementById('remind-night').checked;
+            const timeInput = document.getElementById('reminder-time');
+            if (isNight) {
+                timeInput.value = "20:00"; // 8 PM
+            } else {
+                timeInput.value = "07:00"; // 7 AM
+            }
+        }
+
+        function updateReminderLabels() {
+            const zoneDay = document.getElementById('zone-select').value;
+            const nightText = document.getElementById('night-day-text');
+            const morningText = document.getElementById('morning-day-text');
+            const modalTitle = document.getElementById('modal-title');
+
+            const days = {
+                "Monday": { night: "Sunday Night", morning: "Monday Morning", title: "Zone 1 & 2 Schedule" },
+                "Tuesday": { night: "Monday Night", morning: "Tuesday Morning", title: "Zone 3 & 4 Schedule" },
+                "Wednesday": { night: "Tuesday Night", morning: "Wednesday Morning", title: "Zone 5 & 6 Schedule" }
+            };
+
+            if (days[zoneDay]) {
+                nightText.textContent = days[zoneDay].night;
+                morningText.textContent = days[zoneDay].morning;
+                modalTitle.textContent = days[zoneDay].title;
+            }
+        }
+
+        // --- CORE LOGIC ---
+        // Extends the basic schedule data (from script.js) with reminder specifics
+        function calculateScheduleDataWithReminders() {
+            const zoneDayName = document.getElementById('zone-select').value;
+            const reminderTiming = document.querySelector('input[name="reminder-timing"]:checked').value;
+            const timeVal = document.getElementById('reminder-time').value;
+
+            // Use shared generator
+            const basicWeeks = generateScheduleData(zoneDayName);
+
+            // Map to include reminder details
+            return basicWeeks.map(week => {
+                // Determine Reminder Date
+                let reminderDate;
+                if (reminderTiming === 'night') {
+                    reminderDate = addDays(week.pickupDate, -1);
+                } else {
+                    reminderDate = week.pickupDate;
+                }
+
+                // Holiday Warning Data (for CSV only)
+                let holidayWarning = null;
+                if (week.isDelayed && reminderTiming === 'night') {
+                    // Determine scheduled date (before delay) to calculate when the reminder *would* have been
+                    // Actually, logic: if delayed, pickup is day X+1. Reminder is X (night before pickup).
+                    // Scheduled was X. Night before scheduled was X-1.
+                    // We want to warn on X-1 that it is NOT tomorrow? 
+
+                    // Original logic:
+                    // if isDelayed and Night reminder:
+                    // Warning Date = ScheduledPickup (not delayed) - 1 day.
+                    // Scheduled Pickup = PickupDate - 1 day (since isDelayed adds 1).
+                    let originalScheduledDate = addDays(week.pickupDate, -1);
+
+                    holidayWarning = {
+                        date: addDays(originalScheduledDate, -1),
+                        subject: `Reminder: Recycling Holiday (${week.holidayName})`
+                    };
+                }
+
+                return {
+                    ...week,
+                    reminderDate: reminderDate,
+                    reminderTimeStr: timeVal,
+                    holidayWarning: holidayWarning
+                };
+            });
+        }
+
+        // --- ACTIONS ---
+
+        function downloadSchedule() {
+            const zoneDayName = document.getElementById('zone-select').value;
+            const weeks = calculateScheduleDataWithReminders();
+            let csvContent = "Subject,Start Date,Start Time,End Time,Private\n";
+
+            weeks.forEach(week => {
+                const csvStartTime = formatTimeForCSV(week.reminderTimeStr);
+
+                // Calculate End Time
+                let [h, m] = week.reminderTimeStr.split(':').map(Number);
+                let endH = (h + 1) % 24;
+                const csvEndTime = formatTimeForCSV(`${endH}:${m}`);
+
+                // 1. Holiday Warning Row (if exists)
+                if (week.holidayWarning) {
+                    csvContent += `${week.holidayWarning.subject},${formatDateCSV(week.holidayWarning.date)},${csvStartTime},${csvEndTime},False\n`;
+                }
+
+                // 2. Main Event Row
+                const subject = `Recycling (${week.type})`;
+                csvContent += `${subject},${formatDateCSV(week.reminderDate)},${csvStartTime},${csvEndTime},False\n`;
+            });
+
+            // Trigger Download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `maplewood_recycling_${zoneDayName}_2026.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // SWITCH VIEW TO NEXT STEPS
+            document.getElementById('scheduler-form').style.display = 'none';
+            document.getElementById('next-steps').style.display = 'block';
+        }
+
+        // Helper: Formats YYYY-MM-DD for CSV
+        function formatDateCSV(date) {
+            return date.toISOString().split('T')[0];
+        }
+        // formatTimeForCSV is in script.js now
+
+        function resetForm() {
+            document.getElementById('scheduler-form').style.display = 'block';
+            document.getElementById('next-steps').style.display = 'none';
+        }
+
+        function previewSchedule() {
+            const weeks = calculateScheduleDataWithReminders();
+            const tbody = document.getElementById('schedule-body');
+            tbody.innerHTML = '';
+
+            weeks.forEach(week => {
+                const tr = document.createElement('tr');
+
+                // Pickup Date Column
+                const tdDate = document.createElement('td');
+                let dateHTML = formatDateDisplay(week.pickupDate);
+                if (week.isDelayed) {
+                    dateHTML += `<span class="holiday-tag">Delayed (${week.holidayName})</span>`;
+                }
+                tdDate.innerHTML = dateHTML;
+
+                // Type Column
+                const tdType = document.createElement('td');
+                tdType.textContent = week.type;
+                tdType.className = 'type-badge';
+
+                // Reminder Column
+                const tdReminder = document.createElement('td');
+                tdReminder.className = 'reminder-text';
+                // Custom formatter for this view
+                const dStr = week.reminderDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const tStr = formatTimeForCSV(week.reminderTimeStr);
+                tdReminder.textContent = `${dStr} at ${tStr}`;
+
+                tr.appendChild(tdDate);
+                tr.appendChild(tdType);
+                tr.appendChild(tdReminder);
+                tbody.appendChild(tr);
+            });
+
+            // Show Modal
+            document.getElementById('preview-modal').style.display = 'flex';
+        }
+
+        // Modal Helpers
+        function closeModal() {
+            document.getElementById('preview-modal').style.display = 'none';
+        }
+
+        function closeModalOnOutsideClick(event) {
+            if (event.target.id === 'preview-modal') {
+                closeModal();
+            }
+        }
+
+        // Initialize labels
+        updateReminderLabels();
+    </script>
+
+</body>
+
+</html>
