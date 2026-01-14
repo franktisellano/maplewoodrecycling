@@ -8,7 +8,7 @@ function Footer() {
                 DPW Schedule
             </a>
             . <br />
-            Made by <a href="https://ft.io" target="_blank">Frank</a>
+            Made by <a href="https://ft.io" target="_blank">Frank</a>. Any issues, <a href="mailto:recycling@ft.io">let me know</a>.
         </div>
     );
 }
