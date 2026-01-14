@@ -22,7 +22,7 @@ function Layout() {
     const getHeaderSubtitle = () => {
         switch (location.pathname) {
             case '/':
-                return 'View the complete pickup schedule for your zone.';
+                return 'View the pickup schedule for your zone.';
             case '/guidelines':
                 return 'What goes in the bin? Follow these rules to keep our recycling stream clean.';
             case '/reminders':
