@@ -11,17 +11,17 @@ const TARGET_HOLIDAYS = [
 
 // --- HELPERS ---
 
-function addDays(date, days) {
+export function addDays(date, days) {
     const result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
 }
 
-function getHolidayName(date) {
-    const month = date.getMonth(); 
+export function getHolidayName(date) {
+    const month = date.getMonth();
     const day = date.getDate();
-    const dow = date.getDay(); 
-    
+    const dow = date.getDay();
+
     if (month === 0 && day === 1) return "New Year's Day";
     if (month === 6 && day === 4) return "Independence Day";
     if (month === 11 && day === 25) return "Christmas Day";
@@ -31,18 +31,22 @@ function getHolidayName(date) {
     return null;
 }
 
-function formatDateDisplay(date) {
+export function formatDateDisplay(date) {
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
 // Accepts "HH:MM" 24h format
-function formatTimeForCSV(timeStr) {
+export function formatTimeForCSV(timeStr) {
     const [hourStr, minStr] = timeStr.split(':');
     let hour = parseInt(hourStr);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     hour = hour % 12;
-    hour = hour ? hour : 12; 
+    hour = hour ? hour : 12;
     return `${hour}:${minStr} ${ampm}`;
+}
+
+export function formatDateCSV(date) {
+    return date.toISOString().split('T')[0];
 }
 
 // --- CORE LOGIC ---
@@ -52,10 +56,10 @@ function formatTimeForCSV(timeStr) {
  * @param {string} zoneDayName - "Monday", "Tuesday", or "Wednesday"
  * @returns {Array} Array of week objects
  */
-function generateScheduleData(zoneDayName) {
+export function generateScheduleData(zoneDayName) {
     const dayMap = { "Monday": 1, "Tuesday": 2, "Wednesday": 3 };
     const pickupDayIndex = dayMap[zoneDayName];
-    
+
     if (!pickupDayIndex) return [];
 
     const weeks = [];
@@ -65,7 +69,7 @@ function generateScheduleData(zoneDayName) {
     while (firstMonday.getDay() !== 1) {
         firstMonday = addDays(firstMonday, 1);
     }
-    
+
     let currentWeekType = "Commingled"; // Jan 5, 2026 starts as Commingled
     let iteratorDate = new Date(firstMonday);
 

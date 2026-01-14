@@ -1,41 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
+import React from 'react';
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recycling Guidelines - Maplewood</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;600&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-</head>
+function Guidelines() {
+    return (
+        <>
+            <div className="guidelines-grid">
+                {/* Fiber Week */}
+                <div className="guideline-card fiber">
+                    <h2 className="guideline-title">
+                        FIBER WEEK:<br />Cardboard & Paper
+                    </h2>
 
-<body>
+                    <div className="check-icon">✅</div>
+                    <h3 style={{ textAlign: 'center', marginBottom: '15px' }}>YES! Please Recycle:</h3>
 
-    <div class="container">
-        <header>
-            <nav class="main-nav">
-                <a href="schedule.html">Schedule</a>
-                <a href="guidelines.html" class="active">Guidelines</a>
-                <a href="index.html">Reminders</a>
-            </nav>
-            <h1>Recycling Guidelines</h1>
-            <p class="subtitle">What goes in the bin? Follow these rules to keep our recycling stream clean.</p>
-        </header>
-
-        <div class="content">
-
-            <div class="guidelines-grid">
-                <!-- Fiber Week -->
-                <div class="guideline-card fiber">
-                    <h2 class="guideline-title">FIBER WEEK:<br>Cardboard & Paper</h2>
-
-                    <div class="check-icon">✅</div>
-                    <h3 style="text-align: center; margin-bottom: 15px;">YES! Please Recycle:</h3>
-
-                    <ul class="guideline-list">
+                    <ul className="guideline-list">
                         <li>Corrugated Cardboard (Flattened, no packing materials)</li>
                         <li>Boxboard (Flattened cereal boxes, etc)</li>
                         <li>Paper Bags</li>
@@ -46,14 +24,16 @@
                     </ul>
                 </div>
 
-                <!-- Commingled Week -->
-                <div class="guideline-card commingled">
-                    <h2 class="guideline-title">COMMINGLED WEEK:<br>Glass, Metal & Plastic</h2>
+                {/* Commingled Week */}
+                <div className="guideline-card commingled">
+                    <h2 className="guideline-title">
+                        COMMINGLED WEEK:<br />Glass, Metal & Plastic
+                    </h2>
 
-                    <div class="check-icon">✅</div>
-                    <h3 style="text-align: center; margin-bottom: 15px;">YES! Please Recycle:</h3>
+                    <div className="check-icon">✅</div>
+                    <h3 style={{ textAlign: 'center', marginBottom: '15px' }}>YES! Please Recycle:</h3>
 
-                    <ul class="guideline-list">
+                    <ul className="guideline-list">
                         <li>#1, 2, & 5 Plastic Containers & Bottles with Caps</li>
                         <li>Glass Bottles (Any Color) & Jars with Lids</li>
                         <li>Aluminum cans, pie tins, & catering trays</li>
@@ -64,19 +44,20 @@
                 </div>
             </div>
 
-            <div class="contaminants">
-                <div style="text-align: center;">
-                    <div class="check-icon" style="color: #d32f2f;">❌</div>
+            <div className="contaminants">
+                <div style={{ textAlign: 'center' }}>
+                    <div className="check-icon" style={{ color: '#d32f2f' }}>❌</div>
                     <h2>NO. These items contaminate the recycling.</h2>
-                    <p style="font-weight: 600; margin-bottom: 10px;">IF IN DOUBT, THROW IT OUT.</p>
-                    <p style="margin-bottom: 20px; font-style: italic;">Any materials not on the acceptable list (above)
-                        should not be recycled.</p>
+                    <p style={{ fontWeight: 600, marginBottom: '10px' }}>IF IN DOUBT, THROW IT OUT.</p>
+                    <p style={{ marginBottom: '20px', fontStyle: 'italic' }}>
+                        Any materials not on the acceptable list (above) should not be recycled.
+                    </p>
                 </div>
 
-                <div class="contaminants-list">
-                    <!-- Column 1 -->
+                <div className="contaminants-list">
+                    {/* Column 1 */}
                     <div>
-                        <ul class="guideline-list" style="color: #555;">
+                        <ul className="guideline-list" style={{ color: '#555' }}>
                             <li>Any materials with food or greasy residues</li>
                             <li>Pizza Boxes (other than clean corrugated brown)</li>
                             <li>Wax Cardboard (Produce protection)</li>
@@ -89,9 +70,9 @@
                             <li>Aerosol Cans (Under Pressure)</li>
                         </ul>
                     </div>
-                    <!-- Column 2 -->
+                    {/* Column 2 */}
                     <div>
-                        <ul class="guideline-list" style="color: #555;">
+                        <ul className="guideline-list" style={{ color: '#555' }}>
                             <li>Aluminum foil</li>
                             <li>Electronics</li>
                             <li>Hoses</li>
@@ -114,16 +95,8 @@
                     </div>
                 </div>
             </div>
+        </>
+    );
+}
 
-        </div>
-
-        <div class="footer">
-            Based on the official 2026 Maplewood <a
-                href="https://www.maplewoodnj.gov/Home/Components/News/News/1250/15">DPW Schedule</a>. <br />
-            Made by <a href="https://ft.io">Frank</a>
-        </div>
-    </div>
-
-</body>
-
-</html>
+export default Guidelines;
