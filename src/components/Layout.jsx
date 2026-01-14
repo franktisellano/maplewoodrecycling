@@ -10,7 +10,7 @@ function Layout() {
     const getHeaderTitle = () => {
         switch (location.pathname) {
             case '/':
-                return 'Maplewood Recycling Schedule';
+                return 'Maplewood, NJ Recycling Schedule';
             case '/guidelines':
                 return 'Recycling Guidelines';
             case '/reminders':
