@@ -259,16 +259,10 @@ function Reminders() {
 
                     <div className="download-buttons">
                         <button className="btn-google" onClick={downloadGoogleCSV}>
-                            <svg viewBox="0 0 24 24" width="24" height="24" className="icon">
-                                <path fill="currentColor" d="M19,4H18V2H16V4H8V2H6V4H5A2,2 0 0,0 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V9H19V20M5,7V6H19V7H5Z" />
-                            </svg>
-                            Google Calendar
+                            Download<br />Google Calendar
                         </button>
                         <button className="btn-apple" onClick={downloadAppleICS}>
-                            <svg viewBox="0 0 24 24" width="24" height="24" className="icon">
-                                <path fill="currentColor" d="M19,4H18V2H16V4H8V2H6V4H5C3.89,4 3,4.9 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V10H19V20M19,8H5V6H19V8M17,13H12V18H17V13Z" />
-                            </svg>
-                            Apple Calendar
+                            Download<br />Apple Calendar
                         </button>
                     </div>
 
