@@ -6,12 +6,13 @@ import {
     formatDateCSV,
     formatDateDisplay
 } from '../utils/recycling';
+import { generateICS } from '../utils/ics';
 
 function Reminders() {
     const [zone, setZone] = useState('Monday');
     const [reminderTiming, setReminderTiming] = useState('night');
     const [time, setTime] = useState('20:00');
-    const [showNextSteps, setShowNextSteps] = useState(false);
+    const [showNextSteps, setShowNextSteps] = useState(false); // 'google', 'apple', or false
     const [showPreviewModal, setShowPreviewModal] = useState(false);
 
     // Helper to get labels based on zone
@@ -68,7 +69,7 @@ function Reminders() {
         });
     };
 
-    const downloadSchedule = () => {
+    const downloadGoogleCSV = () => {
         const weeks = calculateScheduleWithReminders();
         let csvContent = "Subject,Start Date,Start Time,End Time,Private\n";
 
@@ -96,7 +97,58 @@ function Reminders() {
         link.click();
         document.body.removeChild(link);
 
-        setShowNextSteps(true);
+        setShowNextSteps('google');
+    };
+
+    const downloadAppleICS = () => {
+        const weeks = calculateScheduleWithReminders();
+        const events = [];
+
+        weeks.forEach(week => {
+            let [h, m] = week.reminderTimeStr.split(':').map(Number);
+
+            // Construct start date
+            const start = new Date(week.reminderDate);
+            start.setHours(h, m, 0);
+
+            // Construct end date (1 hour duration)
+            const end = new Date(start);
+            end.setHours(h + 1);
+
+            if (week.holidayWarning) {
+                // Holiday warning logic if needed, treating as separate event
+                const warnStart = new Date(week.holidayWarning.date);
+                warnStart.setHours(h, m, 0);
+                const warnEnd = new Date(warnStart);
+                warnEnd.setHours(h + 1);
+
+                events.push({
+                    start: warnStart,
+                    end: warnEnd,
+                    summary: week.holidayWarning.subject
+                });
+            }
+
+            events.push({
+                start,
+                end,
+                summary: `Recycling (${week.type})`,
+                description: `Pickup for ${week.type}.`
+            });
+        });
+
+        const icsContent = generateICS(events);
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `maplewood_recycling_${zone}_2026.ics`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setShowNextSteps('apple');
     };
 
     const toggleModal = () => {
@@ -205,8 +257,22 @@ function Reminders() {
                         />
                     </div>
 
-                    <button className="btn-primary" onClick={downloadSchedule}>Download 2026 Schedule</button>
-                    <button className="btn-secondary" onClick={toggleModal}>Preview Schedule</button>
+                    <div className="download-buttons">
+                        <button className="btn-google" onClick={downloadGoogleCSV}>
+                            <svg viewBox="0 0 24 24" width="24" height="24" className="icon">
+                                <path fill="currentColor" d="M19,4H18V2H16V4H8V2H6V4H5A2,2 0 0,0 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V9H19V20M5,7V6H19V7H5Z" />
+                            </svg>
+                            Google Calendar
+                        </button>
+                        <button className="btn-apple" onClick={downloadAppleICS}>
+                            <svg viewBox="0 0 24 24" width="24" height="24" className="icon">
+                                <path fill="currentColor" d="M19,4H18V2H16V4H8V2H6V4H5C3.89,4 3,4.9 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V10H19V20M19,8H5V6H19V8M17,13H12V18H17V13Z" />
+                            </svg>
+                            Apple Calendar
+                        </button>
+                    </div>
+
+                    <button className="btn-secondary" onClick={toggleModal} style={{ width: '100%', marginTop: '10px' }}>Preview Schedule</button>
                 </div>
             ) : (
                 <div id="next-steps">
@@ -215,16 +281,30 @@ function Reminders() {
                     </div>
 
                     <h2 className="steps-title">Next Steps: Import</h2>
-                    <p style={{ marginBottom: '20px', color: '#555' }}>Follow these steps to add the file to Google Calendar:</p>
 
-                    <ol className="steps-list">
-                        <li>Open <strong>Google Calendar</strong> on a desktop computer.</li>
-                        <li>Click the <strong>Gear Icon</strong> ⚙️ at the top right, then select <strong>Settings</strong>.</li>
-                        <li>In the left sidebar, click <strong>Import & export</strong>.</li>
-                        <li>Click "Select file from your computer" and choose the <strong>.csv file</strong> you just downloaded.</li>
-                        <li><strong>Important:</strong> Select the calendar you want to add these events to (e.g., your main calendar).</li>
-                        <li>Click <strong>Import</strong>.</li>
-                    </ol>
+                    {showNextSteps === 'google' ? (
+                        <>
+                            <p style={{ marginBottom: '20px', color: '#555' }}>Follow these steps to add the file to Google Calendar:</p>
+                            <ol className="steps-list">
+                                <li>Open <strong>Google Calendar</strong> on a desktop computer.</li>
+                                <li>Click the <strong>Gear Icon</strong> ⚙️ at the top right, then select <strong>Settings</strong>.</li>
+                                <li>In the left sidebar, click <strong>Import & export</strong>.</li>
+                                <li>Click "Select file from your computer" and choose the <strong>.csv file</strong> you just downloaded.</li>
+                                <li><strong>Important:</strong> Select the calendar you want to add these events to (e.g., your main calendar).</li>
+                                <li>Click <strong>Import</strong>.</li>
+                            </ol>
+                        </>
+                    ) : (
+                        <>
+                            <p style={{ marginBottom: '20px', color: '#555' }}>For Apple Calendar (iPhone / Mac):</p>
+                            <ol className="steps-list">
+                                <li>Locate the downloaded <strong>.ics file</strong>.</li>
+                                <li><strong>Double-click</strong> or tap the file to open it.</li>
+                                <li>When prompted, confirm that you want to add the events to your calendar.</li>
+                                <li>Choose which calendar to add them to (e.g., "Home" or "Work") if asked.</li>
+                            </ol>
+                        </>
+                    )}
 
                     <button className="btn-secondary" onClick={() => setShowNextSteps(false)}>Start Over / Choose Different Zone</button>
                 </div>

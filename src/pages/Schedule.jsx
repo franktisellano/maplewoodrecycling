@@ -7,6 +7,7 @@ function Schedule() {
     const [zone, setZone] = useState(() => {
         return getCookie('recycling_zone') || 'Monday';
     });
+    const [showAll, setShowAll] = useState(false);
     const [schedule, setSchedule] = useState([]);
     const rowRefs = React.useRef({});
     const containerRef = React.useRef(null);
@@ -29,18 +30,25 @@ function Schedule() {
 
     // Auto-scroll effect
     useEffect(() => {
-        if (upcomingIndex !== -1 && rowRefs.current[upcomingIndex] && containerRef.current) {
+        if (showAll && upcomingIndex !== -1 && rowRefs.current[upcomingIndex] && containerRef.current) {
             const rowElement = rowRefs.current[upcomingIndex];
             const containerElement = containerRef.current;
-
-            // Calculate position relative to container
-            // We want it at the top, so we set scrollTop to the row's offsetTop inside the container
-            // Note: offsetTop is relative to offsetParent. If table is parent, we might need adjustments.
-            // Usually, simple offsetTop works if container is positioned.
-
             containerElement.scrollTop = rowElement.offsetTop - containerElement.offsetTop;
         }
-    }, [schedule, upcomingIndex]);
+    }, [schedule, upcomingIndex, showAll]);
+
+    // Prepare visible rows
+    const visibleWeeks = schedule
+        .map((week, index) => ({ ...week, originalIndex: index }))
+        .filter(week => {
+            const d = new Date(week.pickupDate);
+            d.setHours(0, 0, 0, 0);
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            return d >= yesterday;
+        });
+
+    const displayedWeeks = showAll ? visibleWeeks : visibleWeeks.slice(0, 4);
 
     return (
         <>
@@ -60,7 +68,7 @@ function Schedule() {
             <div
                 className="table-container"
                 ref={containerRef}
-                style={{ maxHeight: '500px', border: '1px solid #eee', borderRadius: '12px', position: 'relative' }}
+                style={{ maxHeight: '500px', border: '1px solid #eee', borderRadius: '12px', position: 'relative', display: 'flex', flexDirection: 'column' }}
             >
                 <table id="schedule-table">
                     <thead>
@@ -70,28 +78,13 @@ function Schedule() {
                         </tr>
                     </thead>
                     <tbody>
-                        {schedule.map((week, index) => {
-                            // Filter: Hide rows older than 2 days (Show if pickup >= Yesterday)
-                            // "Show them until one day after they're relevant"
-                            // Relevant = Pickup Date. One day after = Pickup + 1. 
-                            // So Today <= Pickup + 1  => Pickup >= Today - 1 (Yesterday)
-
-                            const d = new Date(week.pickupDate);
-                            d.setHours(0, 0, 0, 0);
-
-                            const yesterday = new Date(today);
-                            yesterday.setDate(today.getDate() - 1);
-
-                            if (d < yesterday) {
-                                return null;
-                            }
-
-                            const isUpcoming = index === upcomingIndex;
+                        {displayedWeeks.map((week) => {
+                            const isUpcoming = week.originalIndex === upcomingIndex;
                             return (
                                 <tr
-                                    key={index}
+                                    key={week.originalIndex}
                                     className={isUpcoming ? 'upcoming-row' : ''}
-                                    ref={el => rowRefs.current[index] = el}
+                                    ref={el => rowRefs.current[week.originalIndex] = el}
                                 >
                                     <td>
                                         {formatDateDisplay(week.pickupDate)}
@@ -120,6 +113,42 @@ function Schedule() {
                         })}
                     </tbody>
                 </table>
+                {!showAll && (
+                    <div style={{ padding: '15px', textAlign: 'center', borderTop: '1px solid #eee' }}>
+                        <button
+                            onClick={() => setShowAll(true)}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--forest-green)',
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                fontWeight: '500'
+                            }}
+                        >
+                            View Annual Schedule
+                        </button>
+                    </div>
+                )}
+                {showAll && (
+                    <div style={{ padding: '15px', textAlign: 'center', borderTop: '1px solid #eee' }}>
+                        <button
+                            onClick={() => setShowAll(false)}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--forest-green)',
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                fontWeight: '500'
+                            }}
+                        >
+                            Show Less
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="cta-card">
