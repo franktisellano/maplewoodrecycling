@@ -259,10 +259,10 @@ function Reminders() {
 
                     <div className="download-buttons">
                         <button className="btn-google" onClick={downloadGoogleCSV}>
-                            Download<br />Google Calendar
+                            Download for<br />Google Calendar
                         </button>
                         <button className="btn-apple" onClick={downloadAppleICS}>
-                            Download<br />Apple Calendar
+                            Download for<br />Apple Calendar
                         </button>
                     </div>
 
