@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { generateScheduleData, formatDateDisplay } from '../utils/recycling';
+import { setCookie, getCookie } from '../utils/cookies';
 
 function Schedule() {
-    const [zone, setZone] = useState('Monday');
+    const [zone, setZone] = useState(() => {
+        return getCookie('recycling_zone') || 'Monday';
+    });
     const [schedule, setSchedule] = useState([]);
     const rowRefs = React.useRef({});
     const containerRef = React.useRef(null);
 
     useEffect(() => {
+        setCookie('recycling_zone', zone, 365);
         setSchedule(generateScheduleData(zone));
     }, [zone]);
 
