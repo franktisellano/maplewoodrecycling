@@ -53,7 +53,10 @@ function Schedule() {
     return (
         <>
             <div className="form-group">
-                <label htmlFor="zone-select">Select Your Zone</label>
+                <label htmlFor="zone-select">
+                    Select Your Zone
+                    <span className="schedule-sub">Find your zone <a href="https://www.maplewoodnj.gov/Home/Components/News/News/1250/15" target="_blank" rel="noopener noreferrer">here</a>.</span>
+                </label>
                 <select
                     id="zone-select"
                     value={zone}
