@@ -9,6 +9,12 @@ const TARGET_HOLIDAYS = [
     "Christmas Day"
 ];
 
+const UNEXPECTED_DELAYS = [
+    { date: "1/26/2026", reason: "Snowstorm" },
+    { date: "1/27/2026", reason: "Snowstorm" },
+    { date: "1/28/2026", reason: "Snowstorm" },
+];
+
 // --- HELPERS ---
 
 export function addDays(date, days) {
@@ -29,6 +35,12 @@ export function getHolidayName(date) {
     if (month === 8 && dow === 1 && day <= 7) return "Labor Day";
     if (month === 10 && dow === 4 && day >= 22 && day <= 28) return "Thanksgiving";
     return null;
+}
+
+export function getUnexpectedDelay(date) {
+    const dateStr = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+    const match = UNEXPECTED_DELAYS.find(d => d.date === dateStr);
+    return match ? match.reason : null;
 }
 
 export function formatDateDisplay(date) {
@@ -76,11 +88,18 @@ export function generateScheduleData(zoneDayName) {
     while (iteratorDate.getFullYear() === YEAR) {
         let scheduledPickupDate = addDays(iteratorDate, pickupDayIndex - 1);
         let holidayName = getHolidayName(scheduledPickupDate);
+        let unexpectedDelay = getUnexpectedDelay(scheduledPickupDate);
         let finalPickupDate = scheduledPickupDate;
         let isDelayed = false;
+        let delayReason = null;
 
         if (holidayName && TARGET_HOLIDAYS.includes(holidayName)) {
             isDelayed = true;
+            delayReason = holidayName;
+            finalPickupDate = addDays(scheduledPickupDate, 1);
+        } else if (unexpectedDelay) {
+            isDelayed = true;
+            delayReason = unexpectedDelay;
             finalPickupDate = addDays(scheduledPickupDate, 1);
         }
 
@@ -88,7 +107,8 @@ export function generateScheduleData(zoneDayName) {
             pickupDate: finalPickupDate,
             type: currentWeekType,
             isDelayed: isDelayed,
-            holidayName: holidayName
+            holidayName: holidayName,
+            delayReason: delayReason
         });
 
         // Iterate

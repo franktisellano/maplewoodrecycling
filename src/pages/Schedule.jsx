@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { generateScheduleData, formatDateDisplay } from '../utils/recycling';
 import { setCookie, getCookie } from '../utils/cookies';
 
+
 function Schedule() {
     const [zone, setZone] = useState(() => {
         return getCookie('recycling_zone') || 'Monday';
@@ -55,7 +56,7 @@ function Schedule() {
             <div className="form-group">
                 <label htmlFor="zone-select">
                     Select Your Zone
-                    <span className="schedule-sub">Find your zone <a href="https://www.maplewoodnj.gov/Home/Components/News/News/1250/15" target="_blank" rel="noopener noreferrer">here</a>.</span>
+                    <span className="schedule-sub">Not sure which zone? <Link to="/find-zone">Find your zone here</Link>.</span>
                 </label>
                 <select
                     id="zone-select"
@@ -92,7 +93,7 @@ function Schedule() {
                                     <td>
                                         {formatDateDisplay(week.pickupDate)}
                                         {week.isDelayed && (
-                                            <span className="holiday-tag">Delayed ({week.holidayName})</span>
+                                            <span className="holiday-tag">Delayed ({week.delayReason})</span>
                                         )}
                                         {isUpcoming && (
                                             <span style={{

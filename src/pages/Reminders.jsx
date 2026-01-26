@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
     generateScheduleData,
     addDays,
@@ -56,7 +57,7 @@ function Reminders() {
 
                 holidayWarning = {
                     date: addDays(originalScheduledDate, -1),
-                    subject: `Reminder: Recycling Holiday (${week.holidayName})`
+                    subject: `Reminder: Recycling Delay (${week.delayReason})`
                 };
             }
 
@@ -185,7 +186,7 @@ function Reminders() {
                                         <tr key={idx}>
                                             <td>
                                                 {formatDateDisplay(week.pickupDate)}
-                                                {week.isDelayed && <span className="holiday-tag">Delayed ({week.holidayName})</span>}
+                                                {week.isDelayed && <span className="holiday-tag">Delayed ({week.delayReason})</span>}
                                             </td>
                                             <td className="type-badge">{week.type}</td>
                                             <td className="reminder-text">{dStr} at {tStr}</td>
@@ -205,7 +206,7 @@ function Reminders() {
             {!showNextSteps ? (
                 <div id="scheduler-form">
                     <div className="form-group">
-                        <label htmlFor="zone-select">Where do you live? <span className="schedule-sub">Find your zone <a href="https://www.maplewoodnj.gov/Home/Components/News/News/1250/15" target="_blank" rel="noopener noreferrer">here</a>.</span></label>
+                        <label htmlFor="zone-select">Where do you live? <span className="schedule-sub">Not sure which zone? <Link to="/find-zone">Find your zone here</Link>.</span></label>
                         <select id="zone-select" value={zone} onChange={(e) => setZone(e.target.value)}>
                             <option value="Monday">Zone 1 & 2 (Monday Pickup)</option>
                             <option value="Tuesday">Zone 3 & 4 (Tuesday Pickup)</option>
