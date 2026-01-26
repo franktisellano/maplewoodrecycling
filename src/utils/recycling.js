@@ -15,6 +15,12 @@ const UNEXPECTED_DELAYS = [
     { date: "1/28/2026", reason: "Snowstorm" },
 ];
 
+const ZONE_DISPLAY_NAMES = {
+    "Monday": "Zone 1 & 2",
+    "Tuesday": "Zone 3 & 4",
+    "Wednesday": "Zone 5 & 6"
+};
+
 // --- HELPERS ---
 
 export function addDays(date, days) {
@@ -59,6 +65,61 @@ export function formatTimeForCSV(timeStr) {
 
 export function formatDateCSV(date) {
     return date.toISOString().split('T')[0];
+}
+
+/**
+ * Gets banner info if there's an upcoming delayed pickup within 4 days.
+ * Shows for 4 days leading up to and including the rescheduled pickup day.
+ * @param {string} zoneDayName - "Monday", "Tuesday", or "Wednesday"
+ * @returns {object|null} Banner info or null if no banner needed
+ */
+export function getPickupBannerInfo(zoneDayName) {
+    const dayMap = { "Monday": 1, "Tuesday": 2, "Wednesday": 3 };
+    const pickupDayIndex = dayMap[zoneDayName];
+    if (!pickupDayIndex) return null;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const zoneName = ZONE_DISPLAY_NAMES[zoneDayName];
+
+    // Find the next normal pickup day for this zone (this week or next)
+    let normalPickupDate = new Date(today);
+    while (normalPickupDate.getDay() !== pickupDayIndex) {
+        normalPickupDate = addDays(normalPickupDate, 1);
+    }
+
+    // If today is past the pickup day this week, check this week's pickup day too
+    // by also checking the most recent pickup day (could be today or earlier this week)
+    let recentPickupDate = new Date(today);
+    while (recentPickupDate.getDay() !== pickupDayIndex) {
+        recentPickupDate = addDays(recentPickupDate, -1);
+    }
+
+    // Check both the recent and upcoming pickup dates for delays
+    for (const checkDate of [recentPickupDate, normalPickupDate]) {
+        const holidayName = getHolidayName(checkDate);
+        const unexpectedDelay = getUnexpectedDelay(checkDate);
+
+        if ((holidayName && TARGET_HOLIDAYS.includes(holidayName)) || unexpectedDelay) {
+            const reason = unexpectedDelay || holidayName;
+            const rescheduledDate = addDays(checkDate, 1);
+
+            // Show banner for 4 days leading up to and including the rescheduled pickup day
+            const daysUntilPickup = Math.floor((rescheduledDate - today) / (1000 * 60 * 60 * 24));
+
+            if (daysUntilPickup >= 0 && daysUntilPickup <= 3) {
+                return {
+                    zoneName,
+                    originalDate: checkDate,
+                    newDate: rescheduledDate,
+                    reason
+                };
+            }
+        }
+    }
+
+    return null;
 }
 
 // --- CORE LOGIC ---

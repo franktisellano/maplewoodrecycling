@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { generateScheduleData, formatDateDisplay } from '../utils/recycling';
+import { generateScheduleData, formatDateDisplay, getPickupBannerInfo } from '../utils/recycling';
 import { setCookie, getCookie } from '../utils/cookies';
 
 
@@ -51,6 +51,68 @@ function Schedule() {
 
     const displayedWeeks = showAll ? visibleWeeks : visibleWeeks.slice(0, 4);
 
+    // Check if we need to show a pickup banner
+    const bannerInfo = getPickupBannerInfo(zone);
+
+    const formatBannerDate = (date) => {
+        return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    };
+
+    const renderPickupBanner = () => {
+        if (!bannerInfo) return null;
+
+        const isPickupDay = today.getTime() === new Date(bannerInfo.newDate).setHours(0, 0, 0, 0);
+
+        const AlertIcon = () => (
+            <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#856404"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ marginRight: '8px', flexShrink: 0 }}
+            >
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+        );
+
+        const eveningDate = new Date(bannerInfo.newDate);
+        eveningDate.setDate(eveningDate.getDate() - 1);
+        const formatShortDate = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+        return (
+            <div style={{
+                backgroundColor: '#fff3cd',
+                border: '1px solid #ffc107',
+                borderRadius: '8px',
+                padding: '16px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'flex-start'
+            }}>
+                <AlertIcon />
+                <div>
+                    <strong style={{ color: '#856404', fontSize: '1.1rem' }}>
+                        {bannerInfo.zoneName} Pickup Changed This Week
+                    </strong>
+                    <p style={{ margin: '8px 0 0 0', color: '#856404' }}>
+                        Recycling pickup moved from {formatBannerDate(bannerInfo.originalDate)} to {formatBannerDate(bannerInfo.newDate)}.
+                    </p>
+                    <p style={{ margin: '4px 0 0 0', color: '#856404' }}>
+                        {isPickupDay
+                            ? 'Put out your recycling now.'
+                            : `Put out your recycling the evening of ${formatShortDate(eveningDate)}.`}
+                    </p>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <>
             <div className="form-group">
@@ -68,6 +130,8 @@ function Schedule() {
                     <option value="Wednesday">Zone 5 & 6 (Wednesday Pickup)</option>
                 </select>
             </div>
+
+            {renderPickupBanner()}
 
             <div
                 className="table-container"
