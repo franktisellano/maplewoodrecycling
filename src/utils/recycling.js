@@ -13,6 +13,9 @@ const UNEXPECTED_DELAYS = [
     { date: "1/26/2026", reason: "Snowstorm" },
     { date: "1/27/2026", reason: "Snowstorm" },
     { date: "1/28/2026", reason: "Snowstorm" },
+    { date: "2/23/2026", reason: "Snowstorm" },
+    { date: "2/24/2026", reason: "Snowstorm" },
+    { date: "2/25/2026", reason: "Snowstorm" },
 ];
 
 const ZONE_DISPLAY_NAMES = {
