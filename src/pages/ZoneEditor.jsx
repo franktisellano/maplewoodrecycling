@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { MapContainer, TileLayer, Polygon, Marker, useMap } from 'react-leaflet';
+import React, { useState, useRef, useMemo } from 'react';
+import { MapContainer, TileLayer, Polygon, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MONDAY_COORDS, TUESDAY_COORDS, WEDNESDAY_COORDS, MAP_CENTER } from '../utils/zoneCoordinates';

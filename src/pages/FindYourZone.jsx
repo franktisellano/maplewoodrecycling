@@ -68,6 +68,8 @@ function FindYourZone() {
         if (!searching) {
             fetchSuggestions();
         }
+        // Only a new address should look up suggestions; a search finishing shouldn't reopen them.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedAddress]);
 
     // Close suggestions on click outside
@@ -148,7 +150,7 @@ function FindYourZone() {
                 capture('zone not found', { reason: 'no address' });
                 setSearching(false);
             }
-        } catch (err) {
+        } catch {
             setError("Something went wrong. Please try again.");
             setSearching(false);
         }
