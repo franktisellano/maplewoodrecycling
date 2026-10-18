@@ -18,10 +18,15 @@ const UNEXPECTED_DELAYS = [
     { date: "2/25/2026", reason: "Snowstorm" },
 ];
 
-const ZONE_DISPLAY_NAMES = {
+export const ZONE_DISPLAY_NAMES = {
     "Monday": "Zone 1 & 2",
     "Tuesday": "Zone 3 & 4",
     "Wednesday": "Zone 5 & 6"
+};
+
+export const TYPE_DETAILS = {
+    "Fibers": "Paper & cardboard",
+    "Commingled": "Glass, metal & plastic"
 };
 
 // --- HELPERS ---

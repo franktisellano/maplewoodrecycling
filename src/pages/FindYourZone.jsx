@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import ZoneMap from '../components/ZoneMap';
 import { determineZone } from '../utils/zoneCoordinates';
 import { setCookie } from '../utils/cookies';
+import { ZONE_DISPLAY_NAMES } from '../utils/recycling';
+import PageHead from '../components/PageHead';
 
 // Simple debounce hook
 function useDebounce(value, delay) {
@@ -150,95 +152,59 @@ function FindYourZone() {
 
     return (
         <>
-            <div style={{ marginBottom: '20px' }}>
-                <Link to="/schedule" style={{ color: 'var(--forest-green)', textDecoration: 'none', fontWeight: '500' }}>← Back to Schedule</Link>
-            </div>
+            <PageHead eyebrow="Zone lookup" title="Find your zone">
+                <p className="lede">Enter your street address to see which recycling zone you're in, or tap your area on the map.</p>
+            </PageHead>
 
-            <h1 style={{ fontFamily: 'DM Serif Display, serif', fontSize: '2rem', marginBottom: '10px', color: 'var(--forest-green)' }}>Find Your Zone</h1>
-            <p style={{ marginBottom: '30px', color: '#666' }}>Enter your address to see which recycling zone you belong to.</p>
-
-            <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', marginBottom: '30px', position: 'relative' }} ref={wrapperRef}>
-                <div style={{ flex: 1, position: 'relative' }}>
-                    <input
-                        type="text"
-                        value={address}
-                        onChange={(e) => {
-                            setAddress(e.target.value);
-                            if (!showSuggestions && e.target.value.length > 2) setShowSuggestions(true);
-                        }}
-                        onFocus={() => {
-                            if (suggestions.length > 0) setShowSuggestions(true);
-                        }}
-                        placeholder="Enter your street address (e.g., 123 Maplewood Ave)"
-                        style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '2px solid #e0e0e0', fontSize: '1rem' }}
-                        autoComplete="off"
-                    />
-                    {showSuggestions && suggestions.length > 0 && (
-                        <div style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
-                            backgroundColor: 'white',
-                            border: '1px solid #e0e0e0',
-                            borderTop: 'none',
-                            borderRadius: '0 0 12px 12px',
-                            zIndex: 1000,
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                            maxHeight: '200px',
-                            overflowY: 'auto'
-                        }}>
-                            {suggestions.map((item, idx) => (
-                                <div
-                                    key={idx}
-                                    onClick={() => selectSuggestion(item)}
-                                    style={{
-                                        padding: '12px 15px',
-                                        cursor: 'pointer',
-                                        borderBottom: idx === suggestions.length - 1 ? 'none' : '1px solid #eee',
-                                        fontSize: '0.95rem',
-                                        color: '#333'
-                                    }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-                                >
-                                    {formatAddress(item)}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                <button
-                    type="submit"
-                    className="btn-primary"
-                    disabled={searching}
-                    style={{ width: 'auto', marginTop: 0, padding: '0 30px', height: '100%' }}
-                >
-                    {searching ? 'Searching...' : 'Search'}
-                </button>
-            </form>
-
-            {resultZone && (
-                <div className="success-banner" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: '1.2rem', marginBottom: '5px' }}>
-                        You are in <strong>{resultZone} Zone</strong>!
+            <div className="page">
+                <form className="address-search" onSubmit={handleSearch} ref={wrapperRef}>
+                    <div className="address-field">
+                        <label className="visually-hidden" htmlFor="address">Street address</label>
+                        <input
+                            id="address"
+                            type="text"
+                            value={address}
+                            onChange={(e) => {
+                                setAddress(e.target.value);
+                                if (!showSuggestions && e.target.value.length > 2) setShowSuggestions(true);
+                            }}
+                            onFocus={() => {
+                                if (suggestions.length > 0) setShowSuggestions(true);
+                            }}
+                            placeholder="e.g. 123 Maplewood Ave"
+                            autoComplete="off"
+                        />
+                        {showSuggestions && suggestions.length > 0 && (
+                            <ul className="suggestions">
+                                {suggestions.map((item, idx) => (
+                                    <li key={idx}>
+                                        <button type="button" onClick={() => selectSuggestion(item)}>
+                                            {formatAddress(item)}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
-                    <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
-                        We've automatically selected this for you.
+                    <button type="submit" className="btn-primary" disabled={searching}>
+                        {searching ? 'Searching…' : 'Search'}
+                    </button>
+                </form>
+
+                {resultZone && (
+                    <div className="notice success" role="status">
+                        <p className="notice-title">You're in {ZONE_DISPLAY_NAMES[resultZone]}, with pickup on {resultZone}s.</p>
+                        <p>We've saved this as your zone.</p>
+                        <Link className="more" to="/"><span className="label">See your schedule</span> <span className="arrow">→</span></Link>
                     </div>
-                    <Link to="/schedule" className="btn-primary" style={{ marginTop: '15px', textAlign: 'center', textDecoration: 'none', display: 'inline-block', width: 'auto', padding: '10px 20px', fontSize: '0.9rem' }}>
-                        Go to Schedule
-                    </Link>
-                </div>
-            )}
+                )}
 
-            {error && (
-                <div style={{ backgroundColor: '#fee', color: '#c00', padding: '15px', borderRadius: '12px', marginBottom: '20px' }}>
-                    {error}
-                </div>
-            )}
+                {error && (
+                    <div className="notice warn" role="alert">
+                        <p>{error}</p>
+                    </div>
+                )}
 
-            <div style={{ marginTop: '20px' }}>
                 <ZoneMap
                     currentZone={resultZone}
                     onZoneSelect={(zone) => {
@@ -247,11 +213,11 @@ function FindYourZone() {
                     }}
                     markerPosition={markerPosition}
                 />
-            </div>
 
-            <p style={{ marginTop: '10px', fontSize: '0.85rem', color: '#888', textAlign: 'center' }}>
-                Note: Map boundaries are approximate. If your address is near a border, please double-check with the official town map.
-            </p>
+                <p className="aside">
+                    Map boundaries are approximate. If you're near a border, double-check with the official township map.
+                </p>
+            </div>
         </>
     );
 }

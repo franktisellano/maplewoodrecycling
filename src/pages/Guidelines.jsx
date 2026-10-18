@@ -1,99 +1,102 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import PageHead from '../components/PageHead';
+import Painting from '../components/Painting';
+
+const FIBERS = [
+    'Corrugated cardboard (flattened, no packing materials)',
+    'Boxboard (flattened cereal boxes, etc.)',
+    'Paper bags',
+    'Junk mail (including window envelopes)',
+    'Office paper',
+    'Newspapers & magazines',
+    'Corrugated brown pizza boxes only (no grease, food & liner removed)',
+];
+
+const COMMINGLED = [
+    '#1, 2 & 5 plastic containers & bottles, with caps',
+    'Glass bottles (any color) & jars, with lids',
+    'Aluminum cans, pie tins & catering trays',
+    'Steel/tin food cans',
+    'Gable-top cartons (OJ, milk, aseptic packaging)',
+    'Juice boxes (TetraPak)',
+];
+
+const KEEP_OUT = [
+    'Anything with food or grease on it',
+    'Pizza boxes (other than clean corrugated brown)',
+    'Waxed cardboard (produce boxes)',
+    'Paper/cardboard egg cartons',
+    'Cardboard tubes and packaging padding',
+    'Plastics #3, 4, 6 & 7, and plastics without numbers',
+    'Plastic bags & plastic film',
+    'Polystyrene foam (Styrofoam)',
+    'Batteries, especially lithium',
+    'Aerosol cans (under pressure)',
+    'Aluminum foil',
+    'Electronics',
+    'Hoses, ropes & wires',
+    'Wood',
+    'Stickers',
+    'Corks',
+    'Clothing',
+    'Motor oil containers',
+    'Light bulbs',
+    'Mirrors & window glass',
+    'Ceramic plates, cups & mugs',
+    'Food waste',
+    'Medical waste',
+    'Hazardous waste',
+];
 
 function Guidelines() {
     return (
         <>
-            <div className="guidelines-grid">
-                {/* Fiber Week */}
-                <div className="guideline-card fiber">
-                    <h2 className="guideline-title">
-                        FIBER WEEK:<br />Cardboard & Paper
-                    </h2>
+            <PageHead eyebrow="What goes in the bin" title="Recycling guidelines">
+                <p className="lede">
+                    Pickups alternate: paper and cardboard one week, glass, metal and plastic the next.
+                    The <Link to="/">schedule</Link> shows which week is which.
+                </p>
+            </PageHead>
 
-                    <div className="check-icon">✅</div>
-                    <h3 style={{ textAlign: 'center', marginBottom: '15px' }}>YES! Please Recycle:</h3>
-
-                    <ul className="guideline-list">
-                        <li>Corrugated Cardboard (Flattened, no packing materials)</li>
-                        <li>Boxboard (Flattened cereal boxes, etc)</li>
-                        <li>Paper Bags</li>
-                        <li>Junk Mail (Including window envelopes)</li>
-                        <li>Office Paper</li>
-                        <li>Newspapers & Magazines</li>
-                        <li>Only Corrugated Brown Pizza Boxes (No grease, food & liner removed)</li>
-                    </ul>
-                </div>
-
-                {/* Commingled Week */}
-                <div className="guideline-card commingled">
-                    <h2 className="guideline-title">
-                        COMMINGLED WEEK:<br />Glass, Metal & Plastic
-                    </h2>
-
-                    <div className="check-icon">✅</div>
-                    <h3 style={{ textAlign: 'center', marginBottom: '15px' }}>YES! Please Recycle:</h3>
-
-                    <ul className="guideline-list">
-                        <li>#1, 2, & 5 Plastic Containers & Bottles with Caps</li>
-                        <li>Glass Bottles (Any Color) & Jars with Lids</li>
-                        <li>Aluminum cans, pie tins, & catering trays</li>
-                        <li>Steel/tin Food Cans</li>
-                        <li>Gable Top cartons (OJ, Milk, aseptic packaging)</li>
-                        <li>Juice Boxes (TetraPak)</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div className="contaminants">
-                <div style={{ textAlign: 'center' }}>
-                    <div className="check-icon" style={{ color: '#d32f2f' }}>❌</div>
-                    <h2>NO. These items contaminate the recycling.</h2>
-                    <p style={{ fontWeight: 600, marginBottom: '10px' }}>IF IN DOUBT, THROW IT OUT.</p>
-                    <p style={{ marginBottom: '20px', fontStyle: 'italic' }}>
-                        Any materials not on the acceptable list (above) should not be recycled.
-                    </p>
-                </div>
-
-                <div className="contaminants-list">
-                    {/* Column 1 */}
-                    <div>
-                        <ul className="guideline-list" style={{ color: '#555' }}>
-                            <li>Any materials with food or greasy residues</li>
-                            <li>Pizza Boxes (other than clean corrugated brown)</li>
-                            <li>Wax Cardboard (Produce protection)</li>
-                            <li>Paper/cardboard egg cartons</li>
-                            <li>Cardboard tubes and packaging padding</li>
-                            <li>Plastics #3, 4, 6, & 7 and plastics without numbers</li>
-                            <li>Plastic Bags & Plastic Film</li>
-                            <li>Polystyrene Foam (Styrofoam)</li>
-                            <li>Batteries, especially lithium</li>
-                            <li>Aerosol Cans (Under Pressure)</li>
+            <div className="page wide">
+                <div className="streams">
+                    <section className="stream" aria-labelledby="fibers-title">
+                        <Painting name="fibers" className="stream-art" />
+                        <h2 id="fibers-title">Fiber week</h2>
+                        <p className="where type-fibers">Paper & cardboard</p>
+                        <ul className="yes-list">
+                            {FIBERS.map(item => <li key={item}>{item}</li>)}
                         </ul>
-                    </div>
-                    {/* Column 2 */}
-                    <div>
-                        <ul className="guideline-list" style={{ color: '#555' }}>
-                            <li>Aluminum foil</li>
-                            <li>Electronics</li>
-                            <li>Hoses</li>
-                            <li>Ropes</li>
-                            <li>Wires</li>
-                            <li>Wood</li>
-                            <li>Stickers</li>
-                            <li>Corks</li>
-                            <li>Clothing</li>
-                            <li>Motor Oil Containers</li>
-                            <li>Light Bulbs</li>
-                            <li>Mirrors</li>
-                            <li>Window Glass</li>
-                            <li>Ceramic Plates</li>
-                            <li>Cups & Mugs</li>
-                            <li>Food Waste</li>
-                            <li>Medical Waste</li>
-                            <li>Hazardous Waste</li>
+                    </section>
+
+                    <section className="stream" aria-labelledby="commingled-title">
+                        <Painting name="commingled" className="stream-art" />
+                        <h2 id="commingled-title">Commingled week</h2>
+                        <p className="where type-commingled">Glass, metal & plastic</p>
+                        <ul className="yes-list">
+                            {COMMINGLED.map(item => <li key={item}>{item}</li>)}
                         </ul>
-                    </div>
+                    </section>
                 </div>
+
+                <Painting name="brush" className="brush-rule" />
+
+                <section className="keep-out" aria-labelledby="keep-out-title">
+                    <div className="keep-out-head">
+                        <Painting name="trash" className="keep-out-art" />
+                        <div>
+                            <h2 className="section-title" id="keep-out-title">Keep these out</h2>
+                            <p className="section-intro">
+                                <strong>If in doubt, throw it out.</strong> Anything not on the lists above goes in the trash.
+                                These items contaminate the recycling.
+                            </p>
+                        </div>
+                    </div>
+                    <ul className="no-list">
+                        {KEEP_OUT.map(item => <li key={item}>{item}</li>)}
+                    </ul>
+                </section>
             </div>
         </>
     );

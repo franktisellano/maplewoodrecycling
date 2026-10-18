@@ -34,13 +34,13 @@ function ZoneMap({ onZoneSelect, currentZone, markerPosition }) {
         fillColor: color,
         weight: isSelected ? 3 : 1,
         opacity: 1,
-        color: isSelected ? '#2d4a3e' : 'white', // Dark border if selected
+        color: isSelected ? '#2f3a33' : '#f8f3e8', // Ink border if selected
         dashArray: isSelected ? '' : '3',
         fillOpacity: isSelected ? 0.7 : 0.4
     });
 
     return (
-        <div style={{ height: '400px', width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e0e0e0', zIndex: 1, position: 'relative' }}>
+        <div className="zone-map">
             <MapContainer center={MAP_CENTER} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -50,7 +50,7 @@ function ZoneMap({ onZoneSelect, currentZone, markerPosition }) {
                 {/* Wednesday: Zones 5 & 6 */}
                 <Polygon
                     positions={WEDNESDAY_COORDS}
-                    pathOptions={zoneStyle('Wednesday', '#F4B860', currentZone === 'Wednesday')}
+                    pathOptions={zoneStyle('Wednesday', '#c99b62', currentZone === 'Wednesday')}
                     eventHandlers={{
                         click: () => onZoneSelect && onZoneSelect('Wednesday'),
                         mouseover: (e) => { e.target.setStyle({ fillOpacity: 0.7 }); },
@@ -63,7 +63,7 @@ function ZoneMap({ onZoneSelect, currentZone, markerPosition }) {
                 {/* Tuesday: Zones 3 & 4 */}
                 <Polygon
                     positions={TUESDAY_COORDS}
-                    pathOptions={zoneStyle('Tuesday', '#D48FB0', currentZone === 'Tuesday')}
+                    pathOptions={zoneStyle('Tuesday', '#6f93ad', currentZone === 'Tuesday')}
                     eventHandlers={{
                         click: () => onZoneSelect && onZoneSelect('Tuesday'),
                         mouseover: (e) => { e.target.setStyle({ fillOpacity: 0.7 }); },
@@ -76,7 +76,7 @@ function ZoneMap({ onZoneSelect, currentZone, markerPosition }) {
                 {/* Monday: Zones 1 & 2 */}
                 <Polygon
                     positions={MONDAY_COORDS}
-                    pathOptions={zoneStyle('Monday', '#87C38F', currentZone === 'Monday')}
+                    pathOptions={zoneStyle('Monday', '#7f9f78', currentZone === 'Monday')}
                     eventHandlers={{
                         click: () => onZoneSelect && onZoneSelect('Monday'),
                         mouseover: (e) => { e.target.setStyle({ fillOpacity: 0.7 }); },

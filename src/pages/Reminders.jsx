@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
     generateScheduleData,
     addDays,
@@ -8,9 +7,12 @@ import {
     formatDateDisplay
 } from '../utils/recycling';
 import { generateICS } from '../utils/ics';
+import { useZone } from '../utils/useZone';
+import PageHead from '../components/PageHead';
+import ZonePicker from '../components/ZonePicker';
 
 function Reminders() {
-    const [zone, setZone] = useState('Monday');
+    const [zone, setZone] = useZone();
     const [reminderTiming, setReminderTiming] = useState('night');
     const [time, setTime] = useState('20:00');
     const [showNextSteps, setShowNextSteps] = useState(false); // 'google', 'apple', or false
@@ -156,23 +158,24 @@ function Reminders() {
         setShowPreviewModal(!showPreviewModal);
     };
 
-    // Modal Component (inline for simplicity or extracted)
-    const Modal = () => {
+
+    // Preview modal, rendered inline
+    const renderModal = () => {
         if (!showPreviewModal) return null;
         const weeks = calculateScheduleWithReminders();
 
         return (
-            <div className="modal-overlay" onClick={(e) => e.target.className === 'modal-overlay' && toggleModal()}>
-                <div className="modal">
+            <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && toggleModal()}>
+                <div className="modal" role="dialog" aria-modal="true" aria-labelledby="preview-title">
                     <div className="modal-header">
-                        <h2 className="modal-title">Zone Schedule</h2>
-                        <button className="close-btn" onClick={toggleModal}>&times;</button>
+                        <h2 className="modal-title" id="preview-title">Your 2026 reminders</h2>
+                        <button className="close-btn" onClick={toggleModal} aria-label="Close">&times;</button>
                     </div>
                     <div className="table-container">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Pickup Date</th>
+                                    <th>Pickup</th>
                                     <th>Type</th>
                                     <th>Reminder</th>
                                 </tr>
@@ -186,9 +189,9 @@ function Reminders() {
                                         <tr key={idx}>
                                             <td>
                                                 {formatDateDisplay(week.pickupDate)}
-                                                {week.isDelayed && <span className="holiday-tag">Delayed ({week.delayReason})</span>}
+                                                {week.isDelayed && <span className="delay-tag">Delayed · {week.delayReason}</span>}
                                             </td>
-                                            <td className="type-badge">{week.type}</td>
+                                            <td className={`type-${week.type.toLowerCase()}`}>{week.type}</td>
                                             <td className="reminder-text">{dStr} at {tStr}</td>
                                         </tr>
                                     );
@@ -203,110 +206,108 @@ function Reminders() {
 
     return (
         <>
-            {!showNextSteps ? (
-                <div id="scheduler-form">
-                    <div className="form-group">
-                        <label htmlFor="zone-select">Where do you live? <span className="schedule-sub">Not sure which zone? <Link to="/find-zone">Find your zone here</Link>.</span></label>
-                        <select id="zone-select" value={zone} onChange={(e) => setZone(e.target.value)}>
-                            <option value="Monday">Zone 1 & 2 (Monday Pickup)</option>
-                            <option value="Tuesday">Zone 3 & 4 (Tuesday Pickup)</option>
-                            <option value="Wednesday">Zone 5 & 6 (Wednesday Pickup)</option>
-                        </select>
-                    </div>
+            <PageHead eyebrow="Calendar reminders" title="Never forget to put out your bin">
+                <p className="lede">Download the whole 2026 schedule for your zone into Google or Apple Calendar and customize your reminder timing.</p>
+            </PageHead>
 
-                    <div className="form-group">
-                        <label>Reminder schedule <span className="schedule-sub">Do you want your calendar events to be on pickup day or the night before?</span></label>
-                        <div className="radio-group">
-                            <div className="radio-option">
-                                <input
-                                    type="radio"
-                                    id="remind-night"
-                                    name="reminder-timing"
-                                    value="night"
-                                    checked={reminderTiming === 'night'}
-                                    onChange={() => handleTimingChange('night')}
-                                />
-                                <label htmlFor="remind-night">
-                                    <span className="option-title">Night Before</span>
-                                    <span className="option-day">{getZoneLabels().night}</span>
+            <div className="page">
+                {!showNextSteps ? (
+                    <div id="scheduler-form">
+                        <ZonePicker zone={zone} onChange={setZone} legend="Where do you live?" />
+
+                        <fieldset className="field">
+                            <legend>
+                                When should we remind you?
+                                <span className="hint">Events go on your calendar the night before pickup, or the morning of.</span>
+                            </legend>
+                            <div className="choices two">
+                                <label className="choice">
+                                    <input
+                                        type="radio"
+                                        name="reminder-timing"
+                                        value="night"
+                                        checked={reminderTiming === 'night'}
+                                        onChange={() => handleTimingChange('night')}
+                                    />
+                                    <span className="choice-body">
+                                        <span className="choice-title">Night before</span>
+                                        <span className="choice-sub">{getZoneLabels().night}</span>
+                                    </span>
+                                </label>
+                                <label className="choice">
+                                    <input
+                                        type="radio"
+                                        name="reminder-timing"
+                                        value="morning"
+                                        checked={reminderTiming === 'morning'}
+                                        onChange={() => handleTimingChange('morning')}
+                                    />
+                                    <span className="choice-body">
+                                        <span className="choice-title">Morning of</span>
+                                        <span className="choice-sub">{getZoneLabels().morning}</span>
+                                    </span>
                                 </label>
                             </div>
-                            <div className="radio-option">
-                                <input
-                                    type="radio"
-                                    id="remind-morning"
-                                    name="reminder-timing"
-                                    value="morning"
-                                    checked={reminderTiming === 'morning'}
-                                    onChange={() => handleTimingChange('morning')}
-                                />
-                                <label htmlFor="remind-morning">
-                                    <span className="option-title">Morning Of</span>
-                                    <span className="option-day">{getZoneLabels().morning}</span>
-                                </label>
-                            </div>
+                        </fieldset>
+
+                        <div className="field">
+                            <label className="field-label" htmlFor="reminder-time">At what time?</label>
+                            <input
+                                type="time"
+                                id="reminder-time"
+                                value={time}
+                                onChange={(e) => setTime(e.target.value)}
+                            />
                         </div>
+
+                        <div className="download-buttons">
+                            <button className="btn-primary" onClick={downloadGoogleCSV}>
+                                <span className="btn-sub">Download for</span> Google Calendar
+                            </button>
+                            <button className="btn-primary" onClick={downloadAppleICS}>
+                                <span className="btn-sub">Download for</span> Apple Calendar
+                            </button>
+                        </div>
+
+                        <button className="link-button" onClick={toggleModal}>Preview the reminders first</button>
                     </div>
+                ) : (
+                    <div id="next-steps">
+                        <div className="notice success" role="status">
+                            <p className="notice-title">Your download has started.</p>
+                            <p>Now bring it into your calendar.</p>
+                        </div>
 
-                    <div className="form-group">
-                        <label htmlFor="reminder-time">Reminder Time</label>
-                        <input
-                            type="time"
-                            id="reminder-time"
-                            value={time}
-                            onChange={(e) => setTime(e.target.value)}
-                        />
+                        {showNextSteps === 'google' ? (
+                            <>
+                                <h2 className="section-title">Import into Google Calendar</h2>
+                                <ol className="steps-list">
+                                    <li>Open <strong>Google Calendar</strong> on a desktop computer.</li>
+                                    <li>Click the <strong>gear icon</strong> at the top right, then select <strong>Settings</strong>.</li>
+                                    <li>In the left sidebar, click <strong>Import & export</strong>.</li>
+                                    <li>Click "Select file from your computer" and choose the <strong>.csv file</strong> you just downloaded.</li>
+                                    <li><strong>Important:</strong> select the calendar you want to add these events to (e.g., your main calendar).</li>
+                                    <li>Click <strong>Import</strong>.</li>
+                                </ol>
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="section-title">Import into Apple Calendar</h2>
+                                <ol className="steps-list">
+                                    <li>Find the downloaded <strong>.ics file</strong>.</li>
+                                    <li><strong>Double-click</strong> or tap the file to open it.</li>
+                                    <li>When prompted, confirm that you want to add the events to your calendar.</li>
+                                    <li>Choose which calendar to add them to (e.g., "Home" or "Work") if asked.</li>
+                                </ol>
+                            </>
+                        )}
+
+                        <button className="btn-secondary" onClick={() => setShowNextSteps(false)}>Start over</button>
                     </div>
+                )}
+            </div>
 
-                    <div className="download-buttons">
-                        <button className="btn-google" onClick={downloadGoogleCSV}>
-                            Download for<br />Google Calendar
-                        </button>
-                        <button className="btn-apple" onClick={downloadAppleICS}>
-                            Download for<br />Apple Calendar
-                        </button>
-                    </div>
-
-                    <button className="btn-secondary" onClick={toggleModal} style={{ width: '100%', marginTop: '10px' }}>Preview Schedule</button>
-                </div>
-            ) : (
-                <div id="next-steps">
-                    <div className="success-banner">
-                        <span>✅</span> Download Started!
-                    </div>
-
-                    <h2 className="steps-title">Next Steps: Import</h2>
-
-                    {showNextSteps === 'google' ? (
-                        <>
-                            <p style={{ marginBottom: '20px', color: '#555' }}>Follow these steps to add the file to Google Calendar:</p>
-                            <ol className="steps-list">
-                                <li>Open <strong>Google Calendar</strong> on a desktop computer.</li>
-                                <li>Click the <strong>Gear Icon</strong> ⚙️ at the top right, then select <strong>Settings</strong>.</li>
-                                <li>In the left sidebar, click <strong>Import & export</strong>.</li>
-                                <li>Click "Select file from your computer" and choose the <strong>.csv file</strong> you just downloaded.</li>
-                                <li><strong>Important:</strong> Select the calendar you want to add these events to (e.g., your main calendar).</li>
-                                <li>Click <strong>Import</strong>.</li>
-                            </ol>
-                        </>
-                    ) : (
-                        <>
-                            <p style={{ marginBottom: '20px', color: '#555' }}>For Apple Calendar (iPhone / Mac):</p>
-                            <ol className="steps-list">
-                                <li>Locate the downloaded <strong>.ics file</strong>.</li>
-                                <li><strong>Double-click</strong> or tap the file to open it.</li>
-                                <li>When prompted, confirm that you want to add the events to your calendar.</li>
-                                <li>Choose which calendar to add them to (e.g., "Home" or "Work") if asked.</li>
-                            </ol>
-                        </>
-                    )}
-
-                    <button className="btn-secondary" onClick={() => setShowNextSteps(false)}>Start Over / Choose Different Zone</button>
-                </div>
-            )}
-
-            {/* Render Modal if active */}
-            <Modal />
+            {renderModal()}
         </>
     );
 }
