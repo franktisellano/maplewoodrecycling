@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ZoneMap from '../components/ZoneMap';
 import { determineZone } from '../utils/zoneCoordinates';
 import { setCookie } from '../utils/cookies';
+import { capture } from '../utils/analytics';
 import { ZONE_DISPLAY_NAMES } from '../utils/recycling';
 import PageHead from '../components/PageHead';
 
@@ -115,7 +116,9 @@ function FindYourZone() {
         if (foundZone) {
             setResultZone(foundZone);
             setCookie('recycling_zone', foundZone, 365);
+            capture('zone found', { how: 'address' });
         } else {
+            capture('zone not found', { reason: 'outside zones' });
             setError("Address found, but it looks like it's outside our known recycling zones. Please select your zone manually or check the map.");
         }
         setSearching(false);
@@ -142,6 +145,7 @@ function FindYourZone() {
                 processSearchResult(lat, lon);
             } else {
                 setError("Address not found. Please try again.");
+                capture('zone not found', { reason: 'no address' });
                 setSearching(false);
             }
         } catch (err) {
@@ -210,6 +214,7 @@ function FindYourZone() {
                     onZoneSelect={(zone) => {
                         setResultZone(zone);
                         setCookie('recycling_zone', zone, 365);
+                        capture('zone found', { how: 'map' });
                     }}
                     markerPosition={markerPosition}
                 />

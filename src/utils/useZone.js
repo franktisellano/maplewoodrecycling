@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { setCookie, getCookie } from './cookies';
+import { capture } from './analytics';
 
 const COOKIE = 'recycling_zone';
 
@@ -13,6 +14,7 @@ export function useZone() {
     const setZone = (next) => {
         setCookie(COOKIE, next, 365);
         setZoneState(next);
+        capture('zone set');
     };
 
     return [zone, setZone];

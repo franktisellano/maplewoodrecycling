@@ -8,6 +8,7 @@ import {
 } from '../utils/recycling';
 import { generateICS } from '../utils/ics';
 import { useZone } from '../utils/useZone';
+import { capture } from '../utils/analytics';
 import PageHead from '../components/PageHead';
 import ZonePicker from '../components/ZonePicker';
 
@@ -101,6 +102,7 @@ function Reminders() {
         document.body.removeChild(link);
 
         setShowNextSteps('google');
+        capture('calendar added', { kind: 'google', reminder: reminderTiming });
     };
 
     const downloadAppleICS = () => {
@@ -152,6 +154,7 @@ function Reminders() {
         document.body.removeChild(link);
 
         setShowNextSteps('apple');
+        capture('calendar added', { kind: 'apple', reminder: reminderTiming });
     };
 
     const toggleModal = () => {
