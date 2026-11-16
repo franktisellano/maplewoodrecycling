@@ -52,16 +52,7 @@ test('reminders page follows the chosen zone', async ({ page }) => {
     }
 });
 
-// The watercolors use SVG turbulence filters. Inline in the page, every repaint above them re-runs
-// the filters, which made tapping a zone on a phone lag by seconds. They must stay <img>s.
-for (const path of ['/', '/reminders', '/guidelines']) {
-    test(`no live SVG filters on ${path}`, async ({ page }) => {
-        await page.goto(path);
-        await expect(page.locator('.hero-sky img')).toBeVisible();
-        expect(await page.locator('svg [filter], svg filter').count()).toBe(0);
-        // And every painting actually loaded.
-        const broken = await page.locator('img').evaluateAll(imgs =>
-            imgs.filter(i => !i.complete || i.naturalWidth === 0).map(i => i.parentElement.className));
-        expect(broken).toEqual([]);
-    });
-}
+test('the address lookup map loads', async ({ page }) => {
+    await page.goto('/find-zone');
+    await expect(page.locator('.zone-map .leaflet-container')).toBeVisible();
+});

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Polygon, Tooltip, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { MONDAY_COORDS, TUESDAY_COORDS, WEDNESDAY_COORDS, MAP_CENTER } from '../utils/zoneCoordinates';
 
 // Fix for default marker icons in React-Leaflet/Vite

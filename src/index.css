@@ -145,6 +145,16 @@ button { font: inherit; color: inherit; }
   padding: 7rem 1.25rem 0;
 }
 
+/* Paper granulation for the pre-rendered watercolors: a small tiled noise mask, cheap to composite.
+   (It's left out of the images because per-pixel noise barely compresses.) */
+.painting img {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.8 0 0 0 0.55'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23g)'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--grain);
+  mask-image: var(--grain);
+  -webkit-mask-size: 64px;
+  mask-size: 64px;
+}
+
 .hero-sky {
   position: absolute;
   inset: 0 0 auto 0;

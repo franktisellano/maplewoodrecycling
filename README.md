@@ -36,6 +36,21 @@ Built with:
    ```
    Visit `http://localhost:5173` in your browser.
 
+## Tests
+
+```bash
+npx playwright install chromium   # once
+npm test
+```
+
+Playwright builds the site and runs each test on an emulated phone (with taps) and on desktop Chrome.
+
+## Paintings
+
+The watercolors are written as SVG in `src/art/paint.js`, but the site shows pre-rendered WebP images
+from `src/art/rendered/`. The SVGs' turbulence filters take phones seconds to draw, which made the site
+slow to load and to respond to taps. After changing a painting, run `npm run art` and commit the images.
+
 ## Deployment
 
 This project is configured for **Netlify**.
