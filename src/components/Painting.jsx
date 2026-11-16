@@ -1,9 +1,13 @@
 import React from 'react';
-import art from '../art/paint';
+import { paintingUrl } from '../art/urls';
 
-// Renders one of the watercolor SVGs from art/paint.js.
+// Renders one of the watercolors from art/paint.js, as an image so its filters are drawn only once.
 function Painting({ name, className }) {
-    return <div className={className} dangerouslySetInnerHTML={{ __html: art[name] }} />;
+    return (
+        <div className={className}>
+            <img src={paintingUrl(name)} alt="" decoding="async" draggable="false" />
+        </div>
+    );
 }
 
 export default Painting;

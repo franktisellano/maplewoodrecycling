@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import art from '../art/paint';
+import { paintingUrl } from '../art/urls';
 
 function Navbar() {
     return (
         <header className="site-header">
             <Link className="wordmark" to="/">
-                <span dangerouslySetInnerHTML={{ __html: art.mark }} />
+                <img src={paintingUrl('mark')} alt="" width="32" height="32" />
                 Maplewood Recycling
             </Link>
             <nav className="site-nav" aria-label="Main">
