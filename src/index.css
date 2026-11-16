@@ -751,6 +751,7 @@ tr:last-child td { border-bottom: 0; }
 @media (max-width: 480px) {
   .site-nav { gap: 1rem; font-size: 0.95rem; }
   .wordmark { font-size: 1.1rem; }
-  .page-head { padding-top: 8.5rem; }
+  /* The header wraps to two lines here, so reach further up to keep the sky under it. */
+  .page-head { margin-top: -7rem; padding-top: 11rem; }
   .choice-title { font-size: 0.95rem; }
 }
